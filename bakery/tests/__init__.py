@@ -29,8 +29,8 @@ except ImportError:  # Django <2.0
 try:
     from django.urls import path as url
 except ImportError:  # Django <2.0
-    from django.conf.urls import url
-
+    # from django.conf.urls import url
+    from django.urls import re_path
 
 def mock_url_view(*args, **kwargs):
     # url objects require a function
@@ -38,9 +38,12 @@ def mock_url_view(*args, **kwargs):
 
 
 urlpatterns = [
-    url('filename.html', mock_url_view, name='filename'),
-    url('directory/filename.html', mock_url_view, name='directory_and_filename'),
-    url('nested/directory/filename.html', mock_url_view, name='nested_directory_and_filename'),
+    # url('filename.html', mock_url_view, name='filename'),
+    # url('directory/filename.html', mock_url_view, name='directory_and_filename'),
+    # url('nested/directory/filename.html', mock_url_view, name='nested_directory_and_filename'),
+    re_path('filename.html', mock_url_view, name='filename'),
+    re_path('directory/filename.html', mock_url_view, name='directory_and_filename'),
+    re_path('nested/directory/filename.html', mock_url_view, name='nested_directory_and_filename'),
 ]
 
 

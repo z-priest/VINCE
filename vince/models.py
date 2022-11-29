@@ -35,7 +35,8 @@ from django.conf import settings
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchVectorField
 from django_countries.fields import CountryField
-from django.contrib.postgres import fields
+# from django.contrib.postgres import fields
+from django.db.models import JSONField
 from django.conf import settings
 from bigvince.storage_backends import PrivateMediaStorage, SharedMediaStorage
 from django.db.models import Q
@@ -128,8 +129,8 @@ class GroupSettings(models.Model):
 
     triage = property(_get_triage)
 
-
-class OldJSONField(fields.JSONField):
+# class OldJSONField(fields.JSONField):
+class OldJSONField(JSONField):
     def db_type(self, connection):
         return 'json'
 

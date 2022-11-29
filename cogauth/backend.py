@@ -33,7 +33,11 @@ from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
-from django.utils.six import iteritems
+# from django.utils.six import iteritems
+try:
+    from django.utils.six import iteritems
+except:
+    from six import iteritems
 from django.contrib.auth.models import User
 from lib.warrant import Cognito
 from lib.warrant.exceptions import ForceChangePasswordException, SoftwareTokenException, SMSMFAException
@@ -45,8 +49,10 @@ import requests
 from vinny.models import VinceAPIToken
 from rest_framework import exceptions
 from rest_framework.authentication import BaseAuthentication, TokenAuthentication, get_authorization_header
-from django.utils.encoding import smart_text
-from django.utils.translation import ugettext as _
+# from django.utils.encoding import smart_text
+# from django.utils.translation import ugettext as _
+from django.utils.encoding import smart_str
+from django.utils.translation import gettext as _
 import traceback
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -319,7 +325,8 @@ class JSONWebTokenAuthentication(BaseAuthentication):
     def get_jwt_token(self, request):
         logger.debug(request.headers)
         auth = get_authorization_header(request).split()
-        if not auth or smart_text(auth[0].lower()) != "bearer":
+        # if not auth or smart_text(auth[0].lower()) != "bearer":
+        if not auth or smart_str(auth[0].lower()) != "bearer":
             return None
 
         if len(auth) == 1:

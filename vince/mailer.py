@@ -32,7 +32,10 @@ import os
 import pytz
 from smtplib import SMTPException
 from django.conf import settings
-from django.utils import six
+try:
+    from django.utils import six
+except:
+    import six
 from django.utils.safestring import mark_safe
 from vince.models import Ticket, Contact, VulnerabilityCase, CaseAction, CaseAssignment, AdminPGPEmail, VTDailyNotification, TicketQueue, CalendarEvent, FollowUp, EmailTemplate, EmailContact
 from vinny.models import Case, VTCaseRequest, VinceCommGroupAdmin, VinceCommContact, GroupContact, VinceCommEmail

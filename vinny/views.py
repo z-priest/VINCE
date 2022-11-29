@@ -27,7 +27,8 @@
 # DM21-1126
 ########################################################################
 import logging
-from django.shortcuts import render, redirect, get_object_or_404, render_to_response
+# from django.shortcuts import render, redirect, get_object_or_404, render_to_response
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.views import generic, View
 from django.views.generic.edit import FormView, UpdateView, FormMixin, CreateView
@@ -36,7 +37,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponse, Http404, JsonResponse, HttpResponseNotAllowed, HttpResponseServerError, HttpResponseForbidden, HttpResponseRedirect, HttpResponseBadRequest
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError, PermissionDenied
-from django.utils.translation import ugettext as _
+# from django.utils.translation import ugettext as _
+from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.db.models import Case as DBCase
 import pytz
@@ -4279,7 +4281,8 @@ class CreateServiceAccountView(LoginRequiredMixin,TokenMixin,UserPassesTestMixin
     
 def csrf_failure_view(request, reason=""):
     ctx = {'message': 'Error'}
-    return render_to_response("vinny/csrf_fail.html", ctx)
+    # return render_to_response( "vinny/csrf_fail.html", ctx)
+    return render(request, "vinny/csrf_fail.html", ctx)
 
 
 class CaseCSAFAPIView(generics.RetrieveAPIView):

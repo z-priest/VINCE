@@ -27,7 +27,8 @@
 # DM21-1126
 ########################################################################
 from __future__ import print_function
-from django.shortcuts import render, get_object_or_404, render_to_response, redirect
+# from django.shortcuts import render, get_object_or_404, render_to_response, redirect
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views import generic
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
 from django.views.generic.edit import FormView, UpdateView, CreateView, FormMixin
@@ -40,7 +41,8 @@ from django.template import RequestContext
 from django.contrib.postgres.search import SearchVector, SearchRank
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.encoding import force_text
+# from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.core.paginator import Paginator
 from django.db import connection
 from django.db.models import Q
@@ -593,7 +595,8 @@ RE_SPACE = re.compile(r"[\s]+", re.UNICODE)
 
 
 def escape_query(text, re_escape_chars):
-    text = force_text(text)
+    # text = force_text(text)
+    text = force_str(text)
     text = RE_SPACE.sub(" ", text)  # Standardize spacing.
     text = re_escape_chars.sub(" ", text)  # Replace harmful characters with space.
     text = text.strip()

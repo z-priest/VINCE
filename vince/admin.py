@@ -35,7 +35,8 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth import get_user_model
 from django.contrib.auth import views as auth_views
 from django.contrib.admin.views.decorators import staff_member_required
-from django.utils.translation import ugettext_lazy as _
+# from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from vince.models import TicketQueue, Ticket, FollowUp, CaseTemplate, UserSettings, Contact, QueuePermissions, CasePermissions, TicketThread, CaseAssignment, CaseAction, ContactAssociation, CaseParticipant, CalendarEvent, VulNote, BounceEmailNotification
 from vince.models import TicketChange, Attachment, VulnerabilityCase, EmailTemplate, EmailContact, AdminPGPEmail, Artifact, Vulnerability, VendorStatus, VulnerableVendor, VinceSMIMECertificate, UserRole, VinceReminder, GroupSettings, TagManager
 from vinny.models import Thread, Message, VTCaseRequest, CaseMember, VendorAction

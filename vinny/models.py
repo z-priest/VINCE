@@ -28,13 +28,13 @@
 ########################################################################
 from django.db import models, transaction
 # Create your models here.
-from django.utils.translation import ugettext, gettext_lazy as _
+# from django.utils.translation import ugettext, gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from django.contrib.auth.models import User, Group
 from django.conf import settings
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchVectorField
 from django_countries.fields import CountryField
-from django.contrib.postgres import fields
 from django.utils import timezone
 from django.urls import reverse
 from django.contrib.auth.hashers import make_password
@@ -44,7 +44,8 @@ from .utils import cached_attribute
 from django.utils.functional import cached_property
 from vinny.mailer import send_newmessage_mail
 from bigvince.storage_backends import PrivateMediaStorage, SharedMediaStorage
-from django.utils.encoding import smart_text
+# from django.utils.encoding import smart_text
+from django.utils.encoding import smart_str
 from lib.vince.m2crypto_encrypt_decrypt import ED
 import base64
 import os
@@ -61,7 +62,8 @@ import io
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-message_sent = Signal(providing_args=["message", "thread", "reply"])
+# message_sent = Signal(providing_args=["message", "thread", "reply"])
+message_sent = Signal()
 
 def random_logo_color():
     return "#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
@@ -1993,6 +1995,7 @@ class MessageAttachment(models.Model):
         """
 
         if file.size:
+            # filename = smart_str(file.name)
             filename = smart_text(file.name)
             logger.debug(filename)
             try:

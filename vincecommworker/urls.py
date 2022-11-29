@@ -38,14 +38,17 @@ Class-based views
     1. Add an import:  from other_app.views import Home
     2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
 Including another URLconf
-    1. Import the include() function: from django.conf.urls import url, include
+    1. Import the include() function: from django.urls import re-path, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url
+# from django.conf.urls import url
+from django.urls import re_path
 from vincecommworker.views import vincecomm_send_email, send_daily_digest
 
 
 urlpatterns = [
-    url(r'^ingest/$', vincecomm_send_email, name='comm_email'),
-    url(r'^daily/$', send_daily_digest, name='daily_digest'),
+    # url(r'^ingest/$', vincecomm_send_email, name='comm_email'),
+    # url(r'^daily/$', send_daily_digest, name='daily_digest'),
+    re_path(r'^ingest/$', vincecomm_send_email, name='comm_email'),
+    re_path(r'^daily/$', send_daily_digest, name='daily_digest'),
 ]

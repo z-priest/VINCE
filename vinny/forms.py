@@ -30,7 +30,8 @@ from django import forms
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
-from django.utils.translation import gettext, gettext_lazy as _, pgettext_lazy
+# from django.utils.translation import gettext,gettext_lazy as _, pgettext_lazy
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django.utils import timezone
 from vinny.models import *
 from django.conf import settings
@@ -41,7 +42,8 @@ from re import search
 from django.core.exceptions import ValidationError
 import mimetypes
 import os
-from django.utils.encoding import smart_text
+# from django.utils.encoding import smart_text
+from django.utils.encoding import smart_str
 from vinny.settings import DEFAULT_USER_SETTINGS
 
 class SignUpForm(UserCreationForm):
@@ -551,7 +553,8 @@ class UploadDocumentForm(forms.ModelForm):
         file = self.cleaned_data['attachment']
 
         if file.size:
-            filename = smart_text(file.name)
+            # filename = smart_text(file.name)
+            filename = smart_str(file.name)
             logger.debug(filename)
             try:
                 mime_type = file.content_type
@@ -604,7 +607,8 @@ class UploadFileForm(forms.ModelForm):
         file = self.cleaned_data['attachment']
 
         if file.size:
-            filename = smart_text(file.name)
+            # filename = smart_text(file.name)
+            filename = smart_str(file.name)
             logger.debug(filename)
             try:
                 mime_type = file.content_type

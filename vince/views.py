@@ -66,7 +66,8 @@ from django.template.defaulttags import register
 from django.urls import reverse
 from django.forms.utils import ErrorList
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext as _
+# from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views import generic
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.generic.edit import FormView, FormMixin
@@ -93,7 +94,8 @@ from boto3.exceptions import Boto3Error
 from bigvince.storage_backends import PrivateMediaStorage
 from vince.settings import VULNOTE_TEMPLATE
 from collections import OrderedDict
-from django.utils.http import is_safe_url
+# from django.utils.http import is_safe_url
+from django.utils.http import url_has_allowed_host_and_scheme
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -11527,8 +11529,9 @@ class EditVul(LoginRequiredMixin, TokenMixin, UserPassesTestMixin, FormView):
             messages.error(self.request,
                            f"Error processing vulnerability information: {errors}")
         
-        if self.request.META.get('HTTP_REFERER') and is_safe_url(self.request.META.get('HTTP_REFERER'),set(settings.ALLOWED_HOSTS),True):
-            
+        # if self.request.META.get('HTTP_REFERER') and is_safe_url(self.request.META.get('HTTP_REFERER'),set(settings.ALLOWED_HOSTS),True):
+        if self.request.META.get('HTTP_REFERER') and url_has_allowed_host_and_scheme(self.request.META.get('HTTP_REFERER'),set(settings.ALLOWED_HOSTS),True):
+    
             return HttpResponseRedirect(self.request.META.get('HTTP_REFERER') + "#vuls")
         else:
             return redirect("vince:editvuls", vul.case.id)
@@ -11824,7 +11827,9 @@ class EditCVEView(LoginRequiredMixin, TokenMixin, UserPassesTestMixin, generic.U
                     CVEAffectedProduct.objects.bulk_create(prods)
             except:
                 return HttpResponseServerError()
-        if self.request.META.get('HTTP_REFERER') and (self.request.path not in self.request.META.get('HTTP_REFERER')) and is_safe_url(self.request.META.get('HTTP_REFERER'),set(settings.ALLOWED_HOSTS),True):
+        # if self.request.META.get('HTTP_REFERER') and (self.request.path not in self.request.META.get('HTTP_REFERER')) and is_safe_url(self.request.META.get('HTTP_REFERER'),set(settings.ALLOWED_HOSTS),True):
+        if self.request.META.get('HTTP_REFERER') and (self.request.path not in self.request.META.get('HTTP_REFERER')) and url_has_allowed_host_and_scheme(self.request.META.get('HTTP_REFERER'),set(settings.ALLOWED_HOSTS),True):
+
             return HttpResponseRedirect(self.request.META.get('HTTP_REFERER') + "#vuls")
         else:
             return redirect("vince:vul", cve.vul.id)
@@ -11918,7 +11923,8 @@ class CVEFormView(LoginRequiredMixin, TokenMixin, UserPassesTestMixin, FormView)
         if form.cleaned_data['vul']:
             return redirect("vince:case", form.cleaned_data['vul'].case.id)
 
-        if self.request.META.get('HTTP_REFERER') and is_safe_url(self.request.META.get('HTTP_REFERER'),set(settings.ALLOWED_HOSTS),True):
+        # if self.request.META.get('HTTP_REFERER') and is_safe_url(self.request.META.get('HTTP_REFERER'),set(settings.ALLOWED_HOSTS),True):
+        if self.request.META.get('HTTP_REFERER') and url_has_allowed_host_and_scheme(self.request.META.get('HTTP_REFERER'),set(settings.ALLOWED_HOSTS),True):
             return HttpResponseRedirect(self.request.META.get('HTTP_REFERER') + "#vuls")
         else:
             return redirect("vince:vul", cve.vul.id)
@@ -12124,7 +12130,8 @@ class AddVul(LoginRequiredMixin, TokenMixin, UserPassesTestMixin, FormView):
         if form.cleaned_data['cve_allocator'] == 'True':
             return redirect("vince:newcve",vul.id)
         """
-        if self.request.META.get('HTTP_REFERER') and is_safe_url(self.request.META.get('HTTP_REFERER'),set(settings.ALLOWED_HOSTS),True):
+        # if self.request.META.get('HTTP_REFERER') and is_safe_url(self.request.META.get('HTTP_REFERER'),set(settings.ALLOWED_HOSTS),True):
+        if self.request.META.get('HTTP_REFERER') and url_has_allowed_host_and_scheme(self.request.META.get('HTTP_REFERER'),set(settings.ALLOWED_HOSTS),True):
             return HttpResponseRedirect(self.request.META.get('HTTP_REFERER')+"#vuls")
 
         return redirect("vince:editvuls", case.id)
@@ -12297,7 +12304,8 @@ class RemoveVulnerability(LoginRequiredMixin, TokenMixin, UserPassesTestMixin, g
             #vul note prob doesn't exist
             vul.delete()
 
-        if self.request.META.get('HTTP_REFERER') and is_safe_url(self.request.META.get('HTTP_REFERER'),set(settings.ALLOWED_HOSTS),True):
+        # if self.request.META.get('HTTP_REFERER') and is_safe_url(self.request.META.get('HTTP_REFERER'),set(settings.ALLOWED_HOSTS),True):
+        if self.request.META.get('HTTP_REFERER') and url_has_allowed_host_and_scheme(self.request.META.get('HTTP_REFERER'),set(settings.ALLOWED_HOSTS),True):
             return HttpResponseRedirect(self.request.META.get('HTTP_REFERER') + "#vuls")
         return redirect("vince:editvuls", case.id)
 

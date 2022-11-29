@@ -32,7 +32,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin, UserPass
 from django.forms.utils import ErrorList
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
-from django.utils.translation import ugettext as _
+# from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils.decorators import method_decorator
 from django.core.exceptions import PermissionDenied
 try:
@@ -65,7 +66,8 @@ import logging
 import traceback
 from boto3.exceptions import Boto3Error
 from botocore.exceptions import ClientError, ParamValidationError
-from django.utils.http import is_safe_url
+# from django.utils.http import is_safe_url
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.http.response import JsonResponse
 
 logger = logging.getLogger(__name__)
@@ -794,7 +796,8 @@ class MFAAuthRequiredView(FormView, AccessMixin):
                 if next_url:
                     logger.debug(next_url)
                     try:
-                        if is_safe_url(next_url,set(settings.ALLOWED_HOSTS),True):
+                        # if is_safe_url(next_url,set(settings.ALLOWED_HOSTS),True):
+                        if url_has_allowed_host_and_scheme(next_url,set(settings.ALLOWED_HOSTS),True):
                             return redirect(next_url)
                         else:
                             return redirect(settings.LOGIN_REDIRECT_URL)

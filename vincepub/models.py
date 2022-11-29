@@ -29,7 +29,8 @@
 from __future__ import unicode_literals
 from django.db import models
 from django.utils import timezone
-from django.contrib.postgres import fields
+# from django.contrib.postgres import fields
+from django.db.models import JSONField
 from bakery.models import BuildableModel
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -38,7 +39,8 @@ from django.contrib.postgres.search import SearchVectorField
 from bigvince.storage_backends import VRFReportsStorage
 from django.conf import settings
 
-class OldJSONField(fields.JSONField):
+# class OldJSONField(fields.JSONField):
+class OldJSONField(JSONField):
     def db_type(self, connection):
         return 'json'
 

@@ -38,13 +38,16 @@ Class-based views
     1. Add an import:  from other_app.views import Home                              
     2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')            
 Including another URLconf                                                            
-    1. Import the include() function: from django.conf.urls import url, include      
+    1. Import the include() function: from django.urls import re_path, include      
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))               
 """
-from django.conf.urls import url
+# from django.conf.urls import url
+from django.urls import re_path
 from kbworker.views import check_for_updates
 
 urlpatterns = [
-    url(r'^check-for-updates/$', check_for_updates, name='checkupdate'),
+    # url(r'^check-for-updates/$', check_for_updates, name='checkupdate'),
+    re_path(r'^check-for-updates/$', check_for_updates, name='checkupdate'),
+
 ]
 
