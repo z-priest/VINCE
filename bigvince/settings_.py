@@ -67,7 +67,7 @@ SECRET_KEY = env('SECRET_KEY')
 VINCE_DEV_SYSTEM = os.environ.get('VINCE_DEV_SYSTEM', "")
 if VINCE_DEV_SYSTEM == '1':
     VINCE_DEV_SYSTEM = "title-dev"
-    
+
 LOCALSTACK=os.environ.get('LOCALSTACK')
 
 GOOGLE_SITE_KEY = os.environ.get('GOOGLE_SITE_KEY')
@@ -134,6 +134,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'django_countries',
     'storages',
+    'multiselectfield',
 ]
 
 MIDDLEWARE = [
@@ -227,7 +228,7 @@ else:
     MULTIURL_CONFIG = False
     BUILD_DIR='/local/dir/static/notes'
     KB_SERVER_NAME = SERVER_NAME
-    
+
     #BAKERY_FILESYSTEM = 'mem://'
     #BUILD_DIR="mem:/bakery"
     WRITE_SRMAIL=False
@@ -362,7 +363,7 @@ if os.environ.get('AWS_SECRET_MANAGER', None):
     SUPERUSER = get_secret(os.environ.get('VINCE_SUPERUSER_AUTH'))
 
     #ATTACHMENT_URL = AWS_S3_CUSTOM_DOMAIN + "/vince/comm/attachments"
-    
+
     if VINCE_NAMESPACE == 'vince':
         LOGIN_URL = "vince:login"
         LOGIN_REDIRECT_URL = "vince:dashboard"
@@ -490,7 +491,7 @@ if COGNITO_REGION:
 
     response = urllib.request.urlopen(keys_url)
     COGNITO_KEYS = json.loads(response.read())['keys']
-    
+
 # the AWS_COGNITO_ADMIN_GROUP and COGNITO_VINCETRACK_GROUPS name(s)
 # should match up with the Cognito Group name
 # The COGNITO_ADMIN_GROUP is used to promote users to "staff" upon login
