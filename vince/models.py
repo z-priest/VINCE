@@ -46,6 +46,10 @@ import json
 import uuid
 import re
 import traceback
+#Django 3 and up
+from django.db.models import JSONField
+import io
+from lib.vince import utils as vinceutils
 
 logger = logging.getLogger(__name__)
 
@@ -130,9 +134,15 @@ class GroupSettings(models.Model):
     triage = property(_get_triage)
 
 
-class OldJSONField(fields.JSONField):
+class OldJSONField(JSONField):
+    """ This was due to legacy support in Django 2.2. from_db_value
+    should be explicitily sepcified when extending JSONField """
+
     def db_type(self, connection):
         return 'json'
+
+    def from_db_value(self, value, expression, connection):
+        return value
 
 # Create your models here.
 GROUP_TYPE = (
@@ -668,7 +678,9 @@ class Ticket(models.Model):
     CLOSED_STATUS = 4
     DUPLICATE_STATUS = 5
     IN_PROGRESS_STATUS = 6
-
+    #Maximum related activity to display
+    MAX_ACTIVITY = 20
+    
     STATUS_CHOICES = (
         (OPEN_STATUS, _('Open')),
         (REOPENED_STATUS, _('Reopened')),
@@ -892,6 +904,9 @@ class Ticket(models.Model):
     can_be_resolved = property(_can_be_resolved)
 
     def get_actions(self):
+        #zero or negative max_activity is unlimited
+        if self.MAX_ACTIVITY > 0:
+            self.followup_set.order_by('-date')[:self.MAX_ACTIVITY]
         return self.followup_set.order_by('-date')
 
 
@@ -1255,7 +1270,8 @@ class Attachment(models.Model):
         return '%s' % self.filename
 
     def _get_access_url(self):
-        url = self.file.storage.url(self.file.name, parameters={'ResponseContentDisposition': f'attachment; filename="{self.filename}"'})
+        filename = vinceutils.safe_filename(self.filename,str(self.uuid),self.mime_type)
+        url = self.file.storage.url(self.file.name, parameters={'ResponseContentDisposition': f'attachment; filename="{filename}"'})
         return url
 
     access_url = property(_get_access_url)
@@ -1667,8 +1683,6 @@ class VulNoteRevision(BaseRevisionMixin,  models.Model):
     search_vector = SearchVectorField(null=True)
     
     def __str__(self):
-        logger.debug("in revision")
-        logger.debug(self.content)
         if self.revision_number:
             return "%s (%d)" % (self.title, self.revision_number)
         else:
@@ -2125,9 +2139,12 @@ class VulnerabilityCase(models.Model):
     get_assigned_to = property(_get_assigned_to)
 
     def _get_status_html(self):
+        changed = ""
+        if self.changes_to_publish:
+            changed = "<span class=\"badge warning\" title=\"Unpublished Changes\">U</span>"
         if self.status == self.ACTIVE_STATUS:
             if self.published:
-                return f"<span class=\"label success\">{self.get_status_display()}</span>   <span class=\"label badge-tag-success\">Published</span>"
+                return f"<span class=\"label success\">{self.get_status_display()}</span>   <span class=\"label badge-tag-success\">Published{changed}</span>"
             return f"<span class=\"label success\">{self.get_status_display()}</span>"
 
         else:
@@ -2320,9 +2337,8 @@ class CaseAction(Action):
 
     """
 
-    TASK_ACTIVITY = 8
-
     ACTION_TYPE = (
+        (0, "Generic"),
         (1, "VinceTrack"),
         (2, "Post"),
         (3, "Message"),
@@ -2330,13 +2346,27 @@ class CaseAction(Action):
         (5, "VinceComm Artifact"),
         (6, "Threads"),
         (7, "Vendor Viewed"),
-        (TASK_ACTIVITY, "Task Activity"),
+        (8, "Task Activity"),
         (9, "Publish Vul Note"),
         (10, "Status Change Notify"),
         (11, "Edit Post"),
         (12, "Post Removed"),
     )
 
+    #Actions that can be assigned or re-assigned
+    ASSIGN_ACTIONS = [0,1,9]
+
+    #Actions that can trigger an email
+    EMAILABLE_ACTIONS = [0, 4, 7, 8, 9, 11, 12]
+
+    #Actions map to email_preference_types in user preferences
+    #User preferences is a pickled object in User.usersettings
+    USER_ACTION_MAP = { 1: 'email_case_changes',
+                        2: 'email_new_posts',
+                        3: 'email_new_messages',
+                        4: 'email_new_status',
+                        8: 'email_tasks'}
+    
     action_type = models.IntegerField(
         default=0
     )
@@ -2381,6 +2411,12 @@ class CaseAction(Action):
             action_type=9
 	).order_by('-date')
 
+    def lookup(search):
+        """ Lookup a action type by a number or by a name """
+        if type(search) == int:
+            return next((x[1] for x in CaseAction.ACTION_TYPE if x[0] == search), None)
+        else:
+            return next((x[0] for x in CaseAction.ACTION_TYPE if x[1] == search), None)
 
 #    message = models.IntegerField(
 #        _('VinceComm Message ID'),
@@ -3709,7 +3745,7 @@ class CVEAllocation(models.Model):
 
     assigner = models.EmailField(
         max_length=254,
-        default=settings.CONTACT_EMAIL)
+        default='cert@cert.org')
 
     cve_name = models.CharField(
         _('CVE ID'),
@@ -3786,7 +3822,6 @@ class CVEAllocation(models.Model):
         else:
             return False
         if self.cve_name and self.date_public and len(refs) and len(cwes):
-            logger.debug(len(self.references))
             return True
         else:
             return False
@@ -3801,19 +3836,19 @@ class CVEAffectedProduct(models.Model):
         max_length=200)
 
     version_name = models.CharField(
-        _('Affected Version'),
+        _('Version Range End'),
         blank=True,
         null=True,
         max_length=100)
 
     version_affected = models.CharField(
-        _('Version Affected'),
+        _('Version Range Type'),
         blank=True,
         null=True,
-        max_length=10)
+        max_length=25)
     
     version_value = models.CharField(
-        _('Affected Version Value'),
+        _('Affected Version or Start'),
         max_length=100)
 
     organization = models.CharField(
